@@ -11,6 +11,8 @@ namespace Managers
     public class PlayfabManager : MonoBehaviour
     {
         public static PlayfabManager Instance { get; private set; }
+        private string _email, _password;
+        private bool _isRememberMe;
 
         private void Awake()
         {
@@ -32,15 +34,18 @@ namespace Managers
 
         private bool IsValid(string email, string password)
         {
-            if (email == "" || password == "") return false;
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password)) return false;
             return true;
         }
     
         public void Login(string email, string password, bool isRememberMe)
         {
             if(!IsValid(email, password)){ MenuManager.Instance.SendErrorMessage("Email and Password are not valid."); return;}
-            if(isRememberMe){ PlayerPrefs.SetString("Email", email); PlayerPrefs.SetString("Password", password);}
-
+            
+            _email = email;
+            _password = password;
+            _isRememberMe = isRememberMe;
+            
             var request = new LoginWithEmailAddressRequest()
             {
                 Email = email,
@@ -52,19 +57,27 @@ namespace Managers
                 }
             };
 
+            MenuManager.Instance.EnableLoading();
             PlayFabClientAPI.LoginWithEmailAddress(request, OnLoginSuccess, OnLoginFailure);
         }
 
         public void Logout()
         {
             PlayerPrefs.DeleteAll();
-            Destroy(ClassroomManager.Instance.gameObject);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            // PhotonManager.Instance.Disconnect();
+            // Destroy(ClassroomManager.Instance.gameObject);
+            // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            MenuManager.Instance.EnableLoginMode();
+            MenuManager.Instance.ExitLeft();
         }
 
         private void OnLoginSuccess(LoginResult result)
         {
             string accountName = "";
+            
+            MenuManager.Instance.DisableLoading();
+            
+            if(_isRememberMe){ PlayerPrefs.SetString("Email", _email); PlayerPrefs.SetString("Password", _password);}
 
             if (string.IsNullOrEmpty(result.InfoResultPayload.PlayerProfile.DisplayName))
             {
@@ -93,9 +106,9 @@ namespace Managers
                 return;
             }
             
-            if (!result.InfoResultPayload.UserData.TryGetValue("Deck", out var deck) && role.Value == "0")
+            if (!result.InfoResultPayload.UserData.TryGetValue("Desk", out var desk) && role.Value == "0")
             {
-                MenuManager.Instance.SendErrorMessage("This account doesn't have a deck. Please contact with your school"); 
+                MenuManager.Instance.SendErrorMessage("This account doesn't have a desk. Please contact with your school"); 
                 return;
             }
             
@@ -110,7 +123,7 @@ namespace Managers
                 MenuManager.Instance.DisableTeacherFields();
 
                 MenuManager.Instance.AddClassroom(classroom.Value);
-                MenuManager.Instance.AddDeck(deck.Value);
+                MenuManager.Instance.AddDesk(desk.Value);
             }
             else
             {
@@ -118,13 +131,12 @@ namespace Managers
             }
             
             MenuManager.Instance.EnterLeft();
-            // PhotonManager.Instance.JoinRoom(classroom.Value);
-            // UIMenuManager.Instance.LoadScene(menuName);
         }
 
         private void OnLoginFailure(PlayFabError error)
         {
             MenuManager.Instance.SendErrorMessage("Login failed: " + error.GenerateErrorReport());
+            MenuManager.Instance.DisableLoading();
         }
     }
 }

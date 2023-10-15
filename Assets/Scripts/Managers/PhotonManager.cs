@@ -22,8 +22,13 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         Debug.Log("Connected to master");
-        PhotonNetwork.JoinLobby();
         PhotonNetwork.AutomaticallySyncScene = true;
+        PhotonNetwork.JoinLobby();
+    }
+
+    public void Disconnect()
+    {
+        PhotonNetwork.Disconnect();
     }
 
     public override void OnJoinedLobby()
@@ -46,7 +51,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnCreatedRoom()
     {
-        PhotonNetwork.LoadLevel("Classroom");
+        Debug.Log("Created Room");
+        MenuManager.Instance.OnCreatedRoom();
     }
 
     public void JoinRoom(string classroom)
@@ -58,7 +64,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         Debug.Log("Joined Room");
-        MenuManager.Instance.StudentCount = PhotonNetwork.CurrentRoom.PlayerCount;
+         MenuManager.Instance.SetStudentCount(PhotonNetwork.CurrentRoom.PlayerCount);
+         MenuManager.Instance.OnJoinedRoom();
         //MenuManager.Instance.OpenMenu("Room");
 
         // foreach (Transform player in playerListContent)
@@ -87,7 +94,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         // MenuManager.Instance.OpenMenu("Error Menu");
     }
 
-    public void StartGame()
+    public void StartRoom()
     {
         PhotonNetwork.LoadLevel("Classroom");
     }
@@ -95,12 +102,11 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public void LeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
-        // MenuManager.Instance.OpenMenu("Loading");
     }
 
     public override void OnLeftRoom()
     {
-        //MenuManager.Instance.OpenMenu("Title");
+        MenuManager.Instance.OnLeftRoom();
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
@@ -115,6 +121,12 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         //         continue;
         //     Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp(room);
         // }
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        MenuManager.Instance.OnStudentLeft();
+        Debug.Log($"Player named {otherPlayer.NickName} has left room");
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)

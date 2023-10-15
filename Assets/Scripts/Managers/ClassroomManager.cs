@@ -1,4 +1,5 @@
 using System.IO;
+using System.Threading.Tasks;
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -34,7 +35,7 @@ public class ClassroomManager : MonoBehaviourPunCallbacks
     {
         if (scene.name == "Classroom")
         {
-            Invoke(nameof(InstantiatePlayer), 1f);
+            InstantiatePlayer();
         }
     }
 

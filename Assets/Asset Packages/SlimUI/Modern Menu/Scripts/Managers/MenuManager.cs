@@ -10,8 +10,18 @@ namespace SlimUI.ModernMenu{
 	{
 		public static MenuManager Instance { get; private set; }
 		
+		#region Animator Components
+		
 		private Animator CameraObject;
+        private static readonly int EnterRightProperty = Animator.StringToHash("Enter Right");
+        private static readonly int ExitRightProperty = Animator.StringToHash("Exit Right");
+        private static readonly int EnterLeftProperty = Animator.StringToHash("Enter Left");
+        private static readonly int ExitLeftProperty = Animator.StringToHash("Exit Left");
 
+        #endregion
+        
+        #region Menus
+        
 		// campaign button sub menu
         [Header("Menus")]
         [Tooltip("The Menu for when the MAIN menu buttons")]
@@ -25,12 +35,20 @@ namespace SlimUI.ModernMenu{
         [Tooltip("Optional 4th Menu")]
         public GameObject extrasMenu;
 
+        #endregion
+        
+        #region Theme
+
         public enum Theme {custom1, custom2, custom3};
         [Header("Theme Settings")]
         public Theme theme;
         private int themeIndex;
         public ThemedUIData themeController;
 
+        #endregion
+
+        #region Panels
+        
         [Header("Panels")]
         [Tooltip("The UI Panel parenting all sub menus")]
         public GameObject mainCanvas;
@@ -38,6 +56,8 @@ namespace SlimUI.ModernMenu{
         public GameObject settingsCanvas;
         [Tooltip("The UI Panel for login")]
         public GameObject loginCanvas;
+        [Tooltip("The UI Panel for loading")]
+        public GameObject loadingCanvas;
         [Tooltip("The UI Panel that holds the CONTROLS window tab")]
         public GameObject PanelControls;
         [Tooltip("The UI Panel that holds the VIDEO window tab")]
@@ -53,11 +73,18 @@ namespace SlimUI.ModernMenu{
         [Tooltip("The UI Sub-Panel under KEY BINDINGS for GENERAL")]
         public GameObject PanelGeneral;
         
+        #endregion
+        
+        #region Main Screen Components
         
         [Header("Main Screen")]
         [SerializeField] private GameObject loginButton;
         [SerializeField] private GameObject profileButton;
+        
+        #endregion
 
+        #region Settings Screen Components
+        
         // highlights in settings screen
         [Header("Settings Screen")]
         [Tooltip("Highlight Image for when GAME Tab is selected in Settings")]
@@ -74,6 +101,10 @@ namespace SlimUI.ModernMenu{
         public GameObject lineCombat;
         [Tooltip("Highlight Image for when GENERAL Sub-Tab is selected in KEY BINDINGS")]
         public GameObject lineGeneral;
+
+        #endregion
+        
+        #region Login Screen Components
         
         [Header("Login Screen")]
         [SerializeField] private TMP_Text messageText;
@@ -81,18 +112,28 @@ namespace SlimUI.ModernMenu{
         private string _email, _password;
         private bool _isRememberMe = true;
 
+        #endregion
+        
+        #region Profile Screen Components
+        
         [Header("Profile Screen")]
         [SerializeField] private GameObject profilePanel;
         [SerializeField] private GameObject classroomPanel;
         [SerializeField] private TMP_Text helloText;
         [SerializeField] private TMP_Text nameText;
         [SerializeField] private TMP_Text classroomText;
-        [SerializeField] private TMP_Text deckText;
-        [SerializeField] private TMP_Text studentCountText;
+        [SerializeField] private TMP_Text deskText;
+        [SerializeField] private TMP_Text[] studentCountTexts;
         [SerializeField] private GameObject[] studentFields;
         [SerializeField] private GameObject[] teacherFields;
-        public int StudentCount { get; set; } = 0;
-        private string _classroom, _deck;
+        [SerializeField] private GameObject[] studentRoomFields;
+        [SerializeField] private GameObject[] teacherRoomFields;
+        private int _role, _studentCount;
+        private string _classroom, _desk;
+		
+        #endregion
+        
+        #region Loading Screen Components
         
         [Header("Loading Screen")]
 		[Tooltip("If this is true, the loaded scene won't load until receiving user input")]
@@ -110,6 +151,8 @@ namespace SlimUI.ModernMenu{
         public AudioSource sliderSound;
         [Tooltip("The GameObject holding the Audio Source component for the SWOOSH SOUND when switching to the Settings Screen")]
         public AudioSource swooshSound;
+        
+		#endregion
 
         private void Awake()
         {
@@ -118,6 +161,7 @@ namespace SlimUI.ModernMenu{
 
         void Start(){
 			if (Camera.main != null) CameraObject = Camera.main.GetComponent<Animator>();
+			if (PlayerPrefs.HasKey("Role")) _role = PlayerPrefs.GetInt("Role");
 
 			playMenu.SetActive(false);
 			exitMenu.SetActive(false);
@@ -152,7 +196,9 @@ namespace SlimUI.ModernMenu{
 					break;
 			}
 		}
-        
+
+		#region Handlers
+		
         public void HandleEmail(string email)
         {
 	        _email = email;
@@ -173,9 +219,16 @@ namespace SlimUI.ModernMenu{
 	        _classroom = classroom;
         }
 
-        public void Login()
+        #endregion
+
+        public void EnableLoading()
         {
-	        PlayfabManager.Instance.Login(_email, _password, _isRememberMe);
+	        loadingCanvas.SetActive(true);
+        }
+
+        public void DisableLoading()
+        {
+	        loadingCanvas.SetActive(false);
         }
 
 		public void EnableLoginMode()
@@ -190,78 +243,8 @@ namespace SlimUI.ModernMenu{
 			loginButton.SetActive(false);
 		}
 		
-		public void SendDebugMessage(string message)
-		{
-			messageText.color = Color.green;
-			messageText.text = message;
-		}
-        
-		public void SendErrorMessage(string message)
-		{
-			messageText.color = Color.red;
-			messageText.text = message;
-		}
-
-		public void AddName(string name)
-		{
-			nameText.text += name;
-			helloText.text += name;
-		}
-
-		public void AddClassroom(string classroom)
-		{
-			_classroom = classroom;
-			classroomText.text += _classroom;
-		}
-
-		public void AddDeck(string deck)
-		{
-			_deck = deck;
-			deckText.text += _deck;
-		}
+		#region Main
 		
-		public void JoinClassroom()
-		{
-			PhotonManager.Instance.JoinRoom(_classroom);
-		}
-
-		public void CreateClassroom()
-		{
-			PhotonManager.Instance.CreateRoom(_classroom);
-		}
-		
-		public void OnStudentEntered()
-		{
-			StudentCount++;
-			studentCountText.text = "Student count: " + StudentCount;
-		}
-
-		public void DisableStudentFields()
-		{
-			foreach (var field in studentFields)
-			{
-				field.SetActive(false);
-			}
-                
-			foreach (var field in teacherFields)
-			{
-				field.SetActive(true);
-			}
-		}
-
-		public void DisableTeacherFields()
-		{
-			foreach (var field in studentFields)
-			{
-				field.SetActive(true);
-			}
-                
-			foreach (var field in teacherFields)
-			{
-				field.SetActive(false);
-			}
-		}
-
 		public void PlayCampaign(){
 			exitMenu.SetActive(false);
 			if(extrasMenu) extrasMenu.SetActive(false);
@@ -279,7 +262,8 @@ namespace SlimUI.ModernMenu{
 		{
 			loginCanvas.SetActive(true);
 			settingsCanvas.SetActive(false);
-			PlayerPrefs.SetInt("Role", loginType);
+			_role = loginType;
+			PlayerPrefs.SetInt("Role", _role);
 		}
 
 		public void SettingsCampaign()
@@ -307,41 +291,66 @@ namespace SlimUI.ModernMenu{
 
 		public void EnterRight(){
 			DisablePlayCampaign();
-			CameraObject.SetTrigger("Enter Right");
+			CameraObject.SetTrigger(EnterRightProperty);
 		}
 		
 		public void ExitRight(){
-			CameraObject.SetTrigger("Exit Right");
+			CameraObject.SetTrigger(ExitRightProperty);
 		}
 		
 		public void EnterLeft(){
 			DisablePlayCampaign();
-			CameraObject.SetTrigger("Enter Left");
+			CameraObject.SetTrigger(EnterLeftProperty);
 		}
 		
 		public void ExitLeft(){
-			CameraObject.SetTrigger("Exit Left");
+			CameraObject.SetTrigger(ExitLeftProperty);
+		}
+		
+		public void PlayHover(){
+			hoverSound.Play();
 		}
 
-		void DisableRightPanels(){
-			PanelControls.SetActive(false);
-			PanelVideo.SetActive(false);
-			PanelGame.SetActive(false);
-			PanelKeyBindings.SetActive(false);
-
-			lineGame.SetActive(false);
-			lineControls.SetActive(false);
-			lineVideo.SetActive(false);
-			lineKeyBindings.SetActive(false);
-
-			PanelMovement.SetActive(false);
-			lineMovement.SetActive(false);
-			PanelCombat.SetActive(false);
-			lineCombat.SetActive(false);
-			PanelGeneral.SetActive(false);
-			lineGeneral.SetActive(false);
+		public void PlaySFXHover(){
+			sliderSound.Play();
 		}
 
+		public void PlaySwoosh(){
+			swooshSound.Play();
+		}
+
+		// Are You Sure - Quit Panel Pop Up
+		public void AreYouSure(){
+			exitMenu.SetActive(true);
+			if(extrasMenu) extrasMenu.SetActive(false);
+			DisablePlayCampaign();
+		}
+
+		public void AreYouSureMobile(){
+			exitMenu.SetActive(true);
+			if(extrasMenu) extrasMenu.SetActive(false);
+			mainMenu.SetActive(false);
+			DisablePlayCampaign();
+		}
+
+		public void ExtrasMenu(){
+			playMenu.SetActive(false);
+			if(extrasMenu) extrasMenu.SetActive(true);
+			exitMenu.SetActive(false);
+		}
+
+		public void QuitGame(){
+			#if UNITY_EDITOR
+				UnityEditor.EditorApplication.isPlaying = false;
+			#else
+				Application.Quit();
+			#endif
+		}
+
+		#endregion Main
+		
+		#region Settings
+		
 		public void GamePanel(){
 			DisableRightPanels();
 			PanelGame.SetActive(true);
@@ -387,13 +396,185 @@ namespace SlimUI.ModernMenu{
 			PanelGeneral.SetActive(true);
 			lineGeneral.SetActive(true);
 		}
+		
+		#endregion Settings
+		
+		#region Login
+		
+        public void Login()
+        {
+	        PlayfabManager.Instance.Login(_email, _password, _isRememberMe);
+        }
+		
+		public void SendDebugMessage(string message)
+		{
+			messageText.color = Color.green;
+			messageText.text = message;
+		}
+        
+		public void SendErrorMessage(string message)
+		{
+			messageText.color = Color.red;
+			messageText.text = message;
+		}
+		
+		#endregion Login
+		
+		#region Profile
+		
+		public void AddName(string nickname)
+		{
+			nameText.text = $"Name: {nickname}";
+			helloText.text = $"Hello, {nickname}";;
+		}
 
+		public void AddClassroom(string classroom)
+		{
+			_classroom = classroom;
+			classroomText.text = $"Classroom: {_classroom}";
+		}
+
+		public void AddDesk(string desk)
+		{
+			_desk = desk;
+			deskText.text = $"Desk: {_desk}";
+		}
+		
+		public void JoinClassroom()
+		{
+			PhotonManager.Instance.JoinRoom(_classroom);
+		}
+
+		public void CreateClassroom()
+		{
+			PhotonManager.Instance.CreateRoom(_classroom);
+		}
+
+		public void LeaveClassroom()
+		{
+			PhotonManager.Instance.LeaveRoom();
+		}
+		
+		public void StartClassroom()
+		{
+			PhotonManager.Instance.StartRoom();
+		}
+		
+		public void OnCreatedRoom()
+		{
+			foreach (var field in teacherFields)
+			{
+				{
+					field.SetActive(false);
+				}
+			}
+			foreach (var field in teacherRoomFields)
+			{
+				field.SetActive(true);
+			}
+		}
+
+		public void OnJoinedRoom()
+		{
+			if (PlayerPrefs.GetInt("Role").Equals(0))
+			{
+				foreach (var field in studentFields)
+				{
+					field.SetActive(false);
+				}
+
+				foreach (var field in studentRoomFields)
+				{
+					field.SetActive(true);
+				}
+			}
+		}
+
+		public void OnLeftRoom()
+		{
+			if (_role.Equals(0))
+			{
+				foreach (var field in studentFields)
+				{
+					field.SetActive(true);
+				}
+				foreach (var field in studentRoomFields)
+				{
+					field.SetActive(false);
+				}
+			}
+			else
+			{
+				foreach (var field in teacherFields)
+				{
+					field.SetActive(true);
+				}
+				foreach (var field in teacherRoomFields)
+				{
+					field.SetActive(false);
+				}
+			}
+		}
+
+		public void SetStudentCount(int studentCount)
+		{
+			_studentCount = studentCount - 1;
+			foreach (var studentCountText in studentCountTexts)
+			{
+				studentCountText.text = "Student count: " + _studentCount;
+			}
+		}
+		
+		public void OnStudentEntered()
+		{
+			_studentCount++;
+			foreach (var studentCountText in studentCountTexts)
+			{
+				studentCountText.text = "Student count: " + _studentCount;
+			}
+		}
+		
+		public void OnStudentLeft()
+		{
+			_studentCount--;
+			foreach (var studentCountText in studentCountTexts)
+			{
+				studentCountText.text = "Student count: " + _studentCount;
+			}
+		}
+
+		public void DisableStudentFields()
+		{
+			foreach (var field in studentFields)
+			{
+				field.SetActive(false);
+			}
+                
+			foreach (var field in teacherFields)
+			{
+				field.SetActive(true);
+			}
+		}
+
+		public void DisableTeacherFields()
+		{
+			foreach (var field in studentFields)
+			{
+				field.SetActive(true);
+			}
+                
+			foreach (var field in teacherFields)
+			{
+				field.SetActive(false);
+			}
+		}
+		
 		public void DisableLeftPanels()
 		{
 			profilePanel.SetActive(false);
 			classroomPanel.SetActive(false);
 		}
-
+		
 		public void ProfilePanel()
 		{
 			DisableLeftPanels();
@@ -405,45 +586,26 @@ namespace SlimUI.ModernMenu{
 			DisableLeftPanels();
 			classroomPanel.SetActive(true);
 		}
+		
+		#endregion Profile
+		
+		void DisableRightPanels(){
+			PanelControls.SetActive(false);
+			PanelVideo.SetActive(false);
+			PanelGame.SetActive(false);
+			PanelKeyBindings.SetActive(false);
 
-		public void PlayHover(){
-			hoverSound.Play();
-		}
+			lineGame.SetActive(false);
+			lineControls.SetActive(false);
+			lineVideo.SetActive(false);
+			lineKeyBindings.SetActive(false);
 
-		public void PlaySFXHover(){
-			sliderSound.Play();
-		}
-
-		public void PlaySwoosh(){
-			swooshSound.Play();
-		}
-
-		// Are You Sure - Quit Panel Pop Up
-		public void AreYouSure(){
-			exitMenu.SetActive(true);
-			if(extrasMenu) extrasMenu.SetActive(false);
-			DisablePlayCampaign();
-		}
-
-		public void AreYouSureMobile(){
-			exitMenu.SetActive(true);
-			if(extrasMenu) extrasMenu.SetActive(false);
-			mainMenu.SetActive(false);
-			DisablePlayCampaign();
-		}
-
-		public void ExtrasMenu(){
-			playMenu.SetActive(false);
-			if(extrasMenu) extrasMenu.SetActive(true);
-			exitMenu.SetActive(false);
-		}
-
-		public void QuitGame(){
-			#if UNITY_EDITOR
-				UnityEditor.EditorApplication.isPlaying = false;
-			#else
-				Application.Quit();
-			#endif
+			PanelMovement.SetActive(false);
+			lineMovement.SetActive(false);
+			PanelCombat.SetActive(false);
+			lineCombat.SetActive(false);
+			PanelGeneral.SetActive(false);
+			lineGeneral.SetActive(false);
 		}
 
 		// Load Bar synching animation
