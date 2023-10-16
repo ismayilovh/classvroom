@@ -3,6 +3,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using SlimUI.ModernMenu;
+using UnityEngine.SceneManagement;
 
 public class PhotonManager : MonoBehaviourPunCallbacks
 {
@@ -11,6 +12,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     private void Awake()
     {
         if (Instance == null) Instance = this; else Destroy(gameObject);
+        DontDestroyOnLoad(gameObject);
     }
 
     void Start()
@@ -104,9 +106,24 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         PhotonNetwork.LeaveRoom();
     }
 
+    public override void OnLeftLobby()
+    {
+        Debug.Log("Left lobby");
+    }
+
     public override void OnLeftRoom()
     {
-        MenuManager.Instance.OnLeftRoom();
+        Debug.Log("Left room");
+        if (SceneManager.GetActiveScene().name != "Menu")
+        {
+            Debug.Log("Scene loading...");
+            SceneManager.LoadScene("Menu");
+        }
+        else
+        {
+            MenuManager.Instance.OnLeftRoom();
+        }
+        
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
