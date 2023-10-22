@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -11,7 +12,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
-        if (Instance == null) Instance = this; else Destroy(gameObject);
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
         DontDestroyOnLoad(gameObject);
     }
 
@@ -43,7 +45,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.NickName = name;
     }
-    
+
     public void CreateRoom(string roomName)
     {
         if (string.IsNullOrEmpty(roomName)) return;
@@ -59,15 +61,16 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public void JoinRoom(string classroom)
     {
+        Debug.Log($"Joining Room: {classroom}");
         PhotonNetwork.JoinRoom(classroom);
         //MenuManager.Instance.OpenMenu("Loading");
     }
-    
+
     public override void OnJoinedRoom()
     {
         Debug.Log("Joined Room");
-         MenuManager.Instance.SetStudentCount(PhotonNetwork.CurrentRoom.PlayerCount);
-         MenuManager.Instance.OnJoinedRoom();
+        MenuManager.Instance.SetStudentCount(PhotonNetwork.CurrentRoom.PlayerCount);
+        MenuManager.Instance.OnJoinedRoom();
         //MenuManager.Instance.OpenMenu("Room");
 
         // foreach (Transform player in playerListContent)
@@ -85,14 +88,20 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         // startGameButton.SetActive(PhotonNetwork.IsMasterClient);
     }
 
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        Debug.Log($"Join room failed: {message}");
+    }
+
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
+        Debug.Log($"Master switched to {newMasterClient.NickName}");
         // startGameButton.SetActive(PhotonNetwork.IsMasterClient);
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
-        // errorText.text = "Room creation failed: " + message;
+        Debug.Log($"Room creation failed: {message}");
         // MenuManager.Instance.OpenMenu("Error Menu");
     }
 
@@ -151,5 +160,11 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         MenuManager.Instance.OnStudentEntered();
         Debug.Log($"Player named {newPlayer.NickName} has entered to room");
         //Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(newPlayer);
+    }
+
+    private void OnApplicationQuit()
+    {
+        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.Disconnect();
     }
 }

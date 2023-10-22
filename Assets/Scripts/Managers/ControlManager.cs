@@ -20,7 +20,6 @@ public class ControlManager : MonoBehaviour
 
     public void QuitApp()
     {
-        LeaveClassroom();
         Application.Quit();
     }
 }
