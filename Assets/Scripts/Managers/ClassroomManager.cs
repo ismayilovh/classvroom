@@ -1,27 +1,14 @@
-using System.Collections;
 using System.IO;
+using Managers;
 using Photon.Pun;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
-
-[System.Serializable]
-public class Question
-{
-    public string question;
-    public string[] variants;
-    public string correct;
-}
-
-[System.Serializable]
-public class Exam
-{
-    public Question[] questions;
-}
 
 public class ClassroomManager : MonoBehaviourPunCallbacks
 {
     public static ClassroomManager Instance;
+    private Exam _exam;
 
     private void Awake()
     {
@@ -51,53 +38,32 @@ public class ClassroomManager : MonoBehaviourPunCallbacks
         if (scene.name == "Classroom")
         {
             InstantiatePlayer();
+            if (_exam != null)
+            {
+                MakeExamDay(_exam);
+            }
         }
     }
 
     private void InstantiatePlayer()
     {
-        PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Player Manager"), Vector3.zero, Quaternion.identity);
+        GameObject player = PhotonNetwork.Instantiate(Path.Combine("Photon Prefabs", "Player Manager"), Vector3.zero, Quaternion.identity);
+        
     }
-    
-    public void GenerateExam()
+
+    public void SetExam(Exam exam)
     {
-        string subject = "physics";
-        int questionCount = 10;
-        string difficulty = "average";
-        StartCoroutine(nameof(GetExam), $"https://classvroom.tunardev.vercel.app/generate-exam?subject={subject}&questionCount={questionCount}difficulty={difficulty}");
+        _exam = exam;
     }
-    
-    IEnumerator GetExam(string uri)
+
+    private void MakeExamDay(Exam exam)
     {
-        using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
-        {
-            yield return webRequest.SendWebRequest();
+        photonView.RPC("SendExam", RpcTarget.All , exam);
+    }
 
-            string[] pages = uri.Split('/');
-            int page = pages.Length - 1;
-
-            switch (webRequest.result)
-            {
-                case UnityWebRequest.Result.ConnectionError:
-                case UnityWebRequest.Result.DataProcessingError:
-                    Debug.LogError(pages[page] + ": Error: " + webRequest.error);
-                    break;
-                case UnityWebRequest.Result.ProtocolError:
-                    Debug.LogError(pages[page] + ": HTTP Error: " + webRequest.error);
-                    break;
-                case UnityWebRequest.Result.Success:
-                    string examString = webRequest.downloadHandler.text;
-                    Debug.Log(pages[page] + ":\nReceived: " + examString);
-                    Exam exam = JsonUtility.FromJson<Exam>("{\"questions\":" + examString + "}");
-
-                    foreach (Question question in exam.questions)
-                    {
-                        Debug.Log("Question: " + question.question);
-                        Debug.Log("Variants: " + string.Join(", ", question.variants));
-                        Debug.Log("Correct Answer: " + question.correct);
-                    }
-                    break;
-            }
-        }
+    [PunRPC]
+    public void SendExam(Exam exam)
+    {
+        Debug.Log($"Exam received by {gameObject.name}");
     }
 }

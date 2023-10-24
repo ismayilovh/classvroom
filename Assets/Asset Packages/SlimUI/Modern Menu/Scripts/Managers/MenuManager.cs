@@ -4,6 +4,7 @@ using Managers;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using WebSocketSharp;
 
 namespace SlimUI.ModernMenu{
 	public class MenuManager : MonoBehaviour
@@ -119,6 +120,7 @@ namespace SlimUI.ModernMenu{
         [Header("Profile Screen")]
         [SerializeField] private GameObject profilePanel;
         [SerializeField] private GameObject classroomPanel;
+        [SerializeField] private GameObject examPanel;
         [SerializeField] private TMP_Text helloText;
         [SerializeField] private TMP_Text nameText;
         [SerializeField] private TMP_Text classroomText;
@@ -130,6 +132,7 @@ namespace SlimUI.ModernMenu{
         [SerializeField] private GameObject[] teacherRoomFields;
         private int _role, _studentCount;
         private string _classroom, _desk;
+        private string _subject, _questionCount, _difficulty;
 		
         #endregion
         
@@ -217,6 +220,21 @@ namespace SlimUI.ModernMenu{
         public void HandleClassroomName(string classroom)
         {
 	        _classroom = classroom;
+        }
+
+        public void HandleSubject(string subject)
+        {
+	        _subject = subject;
+        }
+        
+        public void HandleQuestionCount(string questionCount)
+        {
+	        _questionCount = questionCount;
+        }
+        
+        public void HandleDifficulty(string difficulty)
+        {
+	        _difficulty = difficulty;
         }
 
         #endregion
@@ -543,6 +561,17 @@ namespace SlimUI.ModernMenu{
 			}
 		}
 
+		public void GenerateExam()
+		{
+			if (_subject.IsNullOrEmpty() || _questionCount.IsNullOrEmpty() || _difficulty.IsNullOrEmpty())
+			{
+				Debug.Log("Please fill all the fields");
+				return;
+			}
+
+			ExamManager.Instance.GenerateExam(_subject, _questionCount, _difficulty);
+		}
+
 		public void DisableStudentFields()
 		{
 			foreach (var field in studentFields)
@@ -573,6 +602,7 @@ namespace SlimUI.ModernMenu{
 		{
 			profilePanel.SetActive(false);
 			classroomPanel.SetActive(false);
+			examPanel.SetActive(false);
 		}
 		
 		public void ProfilePanel()
@@ -585,6 +615,12 @@ namespace SlimUI.ModernMenu{
 		{
 			DisableLeftPanels();
 			classroomPanel.SetActive(true);
+		}
+
+		public void ExamPanel()
+		{
+			DisableLeftPanels();
+			examPanel.SetActive(true);
 		}
 		
 		#endregion Profile

@@ -1,57 +1,71 @@
 using System.Collections;
-using ScriptableObjects;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UI;
 
 namespace Managers
 {
+    [System.Serializable]
+    public class Question
+    {
+        public string question;
+        public string[] variants;
+        public string correct;
+    }
+
+    [System.Serializable]
+    public class Exam
+    {
+        public Question[] questions;
+    }
+    
     public class ExamManager : MonoBehaviour
     {
-        [SerializeField] private ExamSO[] exams;
+        public static ExamManager Instance { get; private set; }
+        private Exam _exam;
 
-        [SerializeField] private int examIndex;
-
-        [SerializeField] private GameObject[] clipboards; // TODO: make this single GameObject prefab and instantiate clipboard for each student (table)
-
-        [SerializeField] private GameObject questionPrefab;
-
-        private void Start()
+        private void Awake()
         {
-            var exam = exams[examIndex];
-            foreach (var clipboard in clipboards)
+            if (Instance == null) Instance = this;
+            else Destroy(gameObject);
+        }
+        
+        public void GenerateExam(string subject, string questionCount, string difficulty)
+        {
+            StartCoroutine(nameof(GetExam), $"https://classvroom.tunardev.vercel.app/generate-exam?subject={subject}&questionCount={questionCount}difficulty={difficulty}");
+        }
+    
+        IEnumerator GetExam(string uri)
+        {
+            using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
             {
-                var wrapper = clipboard.transform.Find("Canvas").Find("Wrapper");
-                wrapper.Find("Title").GetComponent<TMP_Text>().text = exam.examTitle;
-                var questionIndex = 1;
-                foreach (var question in exam.questions)
-                {
-                    var questionObject = Instantiate(questionPrefab, wrapper);
-                    questionObject.transform.Find("Title").GetComponent<TMP_Text>().text =
-                        questionIndex + ". " + question.title;
-                    var answersContainer = questionObject.transform.Find("Answers");
-                    for (int i = 0; i < 5; i++)
-                    {
-                        var answer = answersContainer.GetChild(i);
-                        answer.Find("Label").GetComponent<Text>().text = question.answers[i];
-                        answer.name = i.ToString();
-                    }
+                yield return webRequest.SendWebRequest();
 
-                questionIndex++;
+                string[] pages = uri.Split('/');
+                int page = pages.Length - 1;
+
+                switch (webRequest.result)
+                {
+                    case UnityWebRequest.Result.ConnectionError:
+                    case UnityWebRequest.Result.DataProcessingError:
+                        Debug.LogError(pages[page] + ": Error: " + webRequest.error);
+                        break;
+                    case UnityWebRequest.Result.ProtocolError:
+                        Debug.LogError(pages[page] + ": HTTP Error: " + webRequest.error);
+                        break;
+                    case UnityWebRequest.Result.Success:
+                        string examString = webRequest.downloadHandler.text;
+                        Debug.Log(pages[page] + ":\nReceived: " + examString);
+                        _exam = JsonUtility.FromJson<Exam>("{\"questions\":" + examString + "}");
+                        DontDestroyOnLoad(gameObject);
+    
+                        break;
                 }
             }
         }
-        
-        public void SendResult(GameObject clipboard)
-        {
-        }
 
-        public void ResetResult(GameObject clipboard)
+        public Exam GetExam()
         {
-            var wrapper = clipboard.transform.GetChild(2).GetChild(0);
-            foreach (var inputField in wrapper.transform.GetComponentsInChildren<TMP_InputField>())
-                inputField.text = "";
+            return _exam;
         }
     }
 }

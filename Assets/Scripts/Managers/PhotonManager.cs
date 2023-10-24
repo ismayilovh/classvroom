@@ -164,7 +164,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     private void OnApplicationQuit()
     {
-        PhotonNetwork.LeaveRoom();
+        if (PhotonNetwork.InRoom) PhotonNetwork.LeaveRoom();
         PhotonNetwork.Disconnect();
     }
 }
