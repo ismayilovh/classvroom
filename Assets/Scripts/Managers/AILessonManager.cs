@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class AILessonManager : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class AILessonManager : MonoBehaviour
         if (Instance == null) Instance = this; else Destroy(gameObject);
     }
 
-    public void GenerateLesson(string subject, string questionCount, string difficulty)
+    public void GenerateLesson(string subject, string difficulty)
     {
         StartCoroutine(nameof(GetLesson), $"https://classvroom.tunardev.vercel.app/generate-exam?subject={subject}&difficulty={difficulty}");
     }
@@ -41,6 +42,7 @@ public class AILessonManager : MonoBehaviour
                     Debug.Log(pages[page] + ":\nReceived: " + webRequest.downloadHandler.text);
                     _lesson = JsonUtility.FromJson<string>(webRequest.downloadHandler.text);
                     MakeDialogue();
+                    SceneManager.LoadScene("AI Lesson");
                     DontDestroyOnLoad(gameObject);
 
                     break;

@@ -132,7 +132,8 @@ namespace SlimUI.ModernMenu{
         [SerializeField] private GameObject[] teacherRoomFields;
         private int _role, _studentCount;
         private string _classroom, _desk;
-        private string _subject, _questionCount, _difficulty;
+        private string _examSubject, _examQuestionCount, _examDifficulty;
+        private string _lessonSubject, _lessonDifficulty;
 		
         #endregion
         
@@ -222,19 +223,29 @@ namespace SlimUI.ModernMenu{
 	        _classroom = classroom;
         }
 
-        public void HandleSubject(string subject)
+        public void HandleExamSubject(string subject)
         {
-	        _subject = subject;
+	        _examSubject = subject;
         }
         
-        public void HandleQuestionCount(string questionCount)
+        public void HandleExamQuestionCount(string questionCount)
         {
-	        _questionCount = questionCount;
+	        _examQuestionCount = questionCount;
         }
         
-        public void HandleDifficulty(string difficulty)
+        public void HandleExamDifficulty(string difficulty)
         {
-	        _difficulty = difficulty;
+	        _examDifficulty = difficulty;
+        }
+
+        public void HandleLessonSubject(string subject)
+        {
+	        _lessonSubject = subject;
+        }
+        
+        public void HandleLessonDifficulty(string difficulty)
+        {
+	        _lessonSubject = difficulty;
         }
 
         #endregion
@@ -563,13 +574,24 @@ namespace SlimUI.ModernMenu{
 
 		public void GenerateExam()
 		{
-			if (_subject.IsNullOrEmpty() || _questionCount.IsNullOrEmpty() || _difficulty.IsNullOrEmpty())
+			if (_examSubject.IsNullOrEmpty() || _examQuestionCount.IsNullOrEmpty() || _examDifficulty.IsNullOrEmpty())
 			{
 				Debug.Log("Please fill all the fields");
 				return;
 			}
 
-			ExamManager.Instance.GenerateExam(_subject, _questionCount, _difficulty);
+			ExamManager.Instance.GenerateExam(_examSubject, _examQuestionCount, _examDifficulty);
+		}
+		
+		public void GenerateLesson()
+		{
+			if (_lessonSubject.IsNullOrEmpty() || _lessonDifficulty.IsNullOrEmpty())
+			{
+				Debug.Log("Please fill all the fields");
+				return;
+			}
+
+			AILessonManager.Instance.GenerateLesson(_examSubject, _examDifficulty);
 		}
 
 		public void DisableStudentFields()
