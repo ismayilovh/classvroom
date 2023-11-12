@@ -121,6 +121,7 @@ namespace SlimUI.ModernMenu{
         [SerializeField] private GameObject profilePanel;
         [SerializeField] private GameObject classroomPanel;
         [SerializeField] private GameObject examPanel;
+        [SerializeField] private GameObject aiLessonPanel;
         [SerializeField] private TMP_Text helloText;
         [SerializeField] private TMP_Text nameText;
         [SerializeField] private TMP_Text classroomText;
@@ -133,7 +134,7 @@ namespace SlimUI.ModernMenu{
         private int _role, _studentCount;
         private string _classroom, _desk;
         private string _examSubject, _examQuestionCount, _examDifficulty;
-        private string _lessonSubject, _lessonDifficulty;
+        private string _lessonSubject, _lesson;
 		
         #endregion
         
@@ -243,9 +244,9 @@ namespace SlimUI.ModernMenu{
 	        _lessonSubject = subject;
         }
         
-        public void HandleLessonDifficulty(string difficulty)
+        public void HandleLesson(string lesson)
         {
-	        _lessonSubject = difficulty;
+	        _lesson = lesson;
         }
 
         #endregion
@@ -585,13 +586,13 @@ namespace SlimUI.ModernMenu{
 		
 		public void GenerateLesson()
 		{
-			if (_lessonSubject.IsNullOrEmpty() || _lessonDifficulty.IsNullOrEmpty())
+			if (_lessonSubject.IsNullOrEmpty() || _lesson.IsNullOrEmpty())
 			{
 				Debug.Log("Please fill all the fields");
 				return;
 			}
 
-			AILessonManager.Instance.GenerateLesson(_examSubject, _examDifficulty);
+			AILessonManager.Instance.GenerateLesson(_lessonSubject, _lesson);
 		}
 
 		public void DisableStudentFields()
@@ -625,6 +626,7 @@ namespace SlimUI.ModernMenu{
 			profilePanel.SetActive(false);
 			classroomPanel.SetActive(false);
 			examPanel.SetActive(false);
+			aiLessonPanel.SetActive(false);
 		}
 		
 		public void ProfilePanel()
@@ -644,6 +646,12 @@ namespace SlimUI.ModernMenu{
 			DisableLeftPanels();
 			examPanel.SetActive(true);
 		}
+        
+        public void AILessonPanel()
+        {
+        	DisableLeftPanels();
+        	aiLessonPanel.SetActive(true);
+        }
 		
 		#endregion Profile
 		

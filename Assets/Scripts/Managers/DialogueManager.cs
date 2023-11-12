@@ -12,8 +12,8 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private GameObject startLessonButton;
     [SerializeField] private GameObject continueButton;
     
-    private string[] _dialogue;
-    private string _lesson;
+    private string[] _dialogue = {"Okay, class, today we're going to be talking about logarithms. Now, I know what you're thinking - logarithms? That sounds boring! But don't worry, I'm going to make this as fun and engaging as possible."}; // TODO: Remove this
+    private string _lesson = "Okay, class, today we're going to be talking about logarithms. Now, I know what you're thinking - logarithms? That sounds boring! But don't worry, I'm going to make this as fun and engaging as possible."; // TODO: Remove this
     private Queue<string> _sentences;
     
     private void Start()

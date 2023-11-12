@@ -15,9 +15,10 @@ public class AILessonManager : MonoBehaviour
         if (Instance == null) Instance = this; else Destroy(gameObject);
     }
 
-    public void GenerateLesson(string subject, string difficulty)
+    public void GenerateLesson(string subject, string lesson)
     {
-        StartCoroutine(nameof(GetLesson), $"https://classvroom.tunardev.vercel.app/generate-exam?subject={subject}&difficulty={difficulty}");
+        // SceneManager.LoadScene("AI Lesson"); // TODO: Remove this
+        StartCoroutine(nameof(GetLesson), $"https://classvroom.tunardev.vercel.app/generate-text?subject={subject}&lesson={lesson}");
     }
 
     IEnumerator GetLesson(string uri)
@@ -40,7 +41,7 @@ public class AILessonManager : MonoBehaviour
                     break;
                 case UnityWebRequest.Result.Success:
                     Debug.Log(pages[page] + ":\nReceived: " + webRequest.downloadHandler.text);
-                    _lesson = JsonUtility.FromJson<string>(webRequest.downloadHandler.text);
+                    _lesson = webRequest.downloadHandler.text;//.Replace("*", string.Empty);
                     MakeDialogue();
                     SceneManager.LoadScene("AI Lesson");
                     DontDestroyOnLoad(gameObject);
@@ -52,7 +53,12 @@ public class AILessonManager : MonoBehaviour
 
     private void MakeDialogue()
     {
-        _dialogue = _lesson.Split(".");
+        // var _lessonCleaned = _lesson.Remove('*');
+        _dialogue = _lesson.Split(".");//_lessonCleaned.Split(".");
+        foreach (var sentence in _dialogue)
+        {
+            Debug.Log(sentence);
+        }
     }
 
     public string[] GetDialogue()

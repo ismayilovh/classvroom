@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -21,6 +22,9 @@ namespace Managers
     public class ExamManager : MonoBehaviour
     {
         public static ExamManager Instance { get; private set; }
+
+        [SerializeField] private TMP_Text messageText;
+        
         private Exam _exam;
 
         private void Awake()
@@ -47,20 +51,32 @@ namespace Managers
                 {
                     case UnityWebRequest.Result.ConnectionError:
                     case UnityWebRequest.Result.DataProcessingError:
-                        Debug.LogError(pages[page] + ": Error: " + webRequest.error);
+                        SendErrorMessage(pages[page] + ": Error: " + webRequest.error);
                         break;
                     case UnityWebRequest.Result.ProtocolError:
-                        Debug.LogError(pages[page] + ": HTTP Error: " + webRequest.error);
+                        SendErrorMessage(pages[page] + ": HTTP Error: " + webRequest.error);
                         break;
                     case UnityWebRequest.Result.Success:
                         string examString = webRequest.downloadHandler.text;
-                        Debug.Log(pages[page] + ":\nReceived: " + examString);
+                        SendDebugMessage("Exam was generated succesfully.");
                         _exam = JsonUtility.FromJson<Exam>("{\"questions\":" + examString + "}");
                         DontDestroyOnLoad(gameObject);
     
                         break;
                 }
             }
+        }
+        
+        void SendDebugMessage(string message)
+        {
+            messageText.color = Color.green;
+            messageText.text = message;
+        }
+        
+        void SendErrorMessage(string message)
+        {
+            messageText.color = Color.red;
+            messageText.text = message;
         }
 
         public Exam GetExam()

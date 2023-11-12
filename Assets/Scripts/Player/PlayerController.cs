@@ -40,6 +40,14 @@ public class PlayerController : MonoBehaviourPun
         
         SendExam(ExamManager.Instance.GetExam());
     }
+    
+    void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                examCanvas.SetActive(!examCanvas.activeInHierarchy);
+            }
+        }
 
     [PunRPC]
     void ShowExam(List<string> questionTexts, List<string[]> variantOptions, List<string> correctAnswers)
