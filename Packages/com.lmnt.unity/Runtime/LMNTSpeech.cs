@@ -24,7 +24,8 @@ public class LMNTSpeech : MonoBehaviour {
     _voiceList = LMNTLoader.LoadVoices();
   }
 
-  public IEnumerator Prefetch() {
+        [System.Obsolete]
+        public IEnumerator Prefetch() {
     if (_handler != null) {
       yield break;
     }
@@ -40,7 +41,21 @@ public class LMNTSpeech : MonoBehaviour {
       request.downloadHandler = _handler;
       yield return request.SendWebRequest();
 
-      _audioSource.clip = _handler.audioClip;
+      if (request.isNetworkError || request.isHttpError)
+      {
+          Debug.LogError("Error downloading audio clip: " + request.error);
+      }
+      else
+      {
+          if (!_handler.isDone)
+          {
+              Debug.LogWarning("Audio clip download aborted.");
+          }
+          else
+          {
+              _audioSource.clip = _handler.audioClip;
+          }
+      }
     }
   }
 

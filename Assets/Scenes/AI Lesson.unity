@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657832, g: 0.49641222, b: 0.57481664, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.22571328, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1504,7 +1504,8 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2979205717811460252, guid: 5d66299f82a18f19f82b10c9c707fa15, type: 3}
     m_RemovedGameObjects:
     - {fileID: 1218304411751864118, guid: 5d66299f82a18f19f82b10c9c707fa15, type: 3}
     m_AddedGameObjects:
@@ -1515,6 +1516,9 @@ PrefabInstance:
       insertIndex: 1
       addedObject: {fileID: 259933525}
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3125728326714750071, guid: 5d66299f82a18f19f82b10c9c707fa15, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 535358016}
     - targetCorrespondingSourceObject: {fileID: 8396079695192420361, guid: 5d66299f82a18f19f82b10c9c707fa15, type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
@@ -1710,6 +1714,7 @@ MonoBehaviour:
   dialogueText: {fileID: 753762109}
   startLessonButton: {fileID: 1773560727}
   continueButton: {fileID: 259933524}
+  menuSceneName: Menu VR
 --- !u!1001 &330103280
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3271,6 +3276,30 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.1929114, y: 4.4544315, z: 0.17376675}
   m_Center: {x: -0.037671916, y: 2.187048, z: 0.03768396}
+--- !u!1 &535358015 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3125728326714750071, guid: 5d66299f82a18f19f82b10c9c707fa15, type: 3}
+  m_PrefabInstance: {fileID: 244362793}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &535358016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 535358015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7951c64acb0fa62458bf30a60089fe2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 0
+  m_CheckFor2DOcclusion: 0
+  m_CheckFor3DOcclusion: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RaycastTriggerInteraction: 1
 --- !u!1 &539498168
 GameObject:
   m_ObjectHideFlags: 0

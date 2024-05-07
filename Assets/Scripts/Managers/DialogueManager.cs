@@ -11,6 +11,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private TMP_Text dialogueText;
     [SerializeField] private GameObject startLessonButton;
     [SerializeField] private GameObject continueButton;
+    [SerializeField] private string menuSceneName = "Menu VR";
     
     private string[] _dialogue = {"Okay, class, today we're going to be talking about logarithms. Now, I know what you're thinking - logarithms? That sounds boring! But don't worry, I'm going to make this as fun and engaging as possible."}; // TODO: Remove this
     private string _lesson = "Okay, class, today we're going to be talking about logarithms. Now, I know what you're thinking - logarithms? That sounds boring! But don't worry, I'm going to make this as fun and engaging as possible."; // TODO: Remove this
@@ -47,7 +48,7 @@ public class DialogueManager : MonoBehaviour
     
     public void LeaveLesson()
     {
-        SceneManager.LoadScene("Menu");
+        SceneManager.LoadScene(menuSceneName);
     }
 
     public void DisplayNextSentence()
