@@ -1425,6 +1425,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2228639544111176854, guid: 5d66299f82a18f19f82b10c9c707fa15, type: 3}
+      propertyPath: m_PositionInput.m_Action.m_Id
+      value: 59770641-2a47-4182-aaeb-116bc5ceff8c
+      objectReference: {fileID: 0}
+    - target: {fileID: 2228639544111176854, guid: 5d66299f82a18f19f82b10c9c707fa15, type: 3}
+      propertyPath: m_RotationInput.m_Action.m_Id
+      value: c8c2b401-a52f-432a-a9b9-464751b56542
+      objectReference: {fileID: 0}
+    - target: {fileID: 2228639544111176854, guid: 5d66299f82a18f19f82b10c9c707fa15, type: 3}
+      propertyPath: m_PositionInput.m_Action.m_Name
+      value: Position Input
+      objectReference: {fileID: 0}
+    - target: {fileID: 2228639544111176854, guid: 5d66299f82a18f19f82b10c9c707fa15, type: 3}
+      propertyPath: m_RotationInput.m_Action.m_Name
+      value: Rotation Input
+      objectReference: {fileID: 0}
     - target: {fileID: 2658597408233453138, guid: 5d66299f82a18f19f82b10c9c707fa15, type: 3}
       propertyPath: sceneViewId
       value: 2
@@ -1436,10 +1452,6 @@ PrefabInstance:
     - target: {fileID: 3505633991225051804, guid: 5d66299f82a18f19f82b10c9c707fa15, type: 3}
       propertyPath: m_Center.y
       value: 0.85
-      objectReference: {fileID: 0}
-    - target: {fileID: 4174126836970117752, guid: 5d66299f82a18f19f82b10c9c707fa15, type: 3}
-      propertyPath: m_RequestedTrackingOriginMode
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6425642829315309860, guid: 5d66299f82a18f19f82b10c9c707fa15, type: 3}
       propertyPath: m_Name

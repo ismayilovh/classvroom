@@ -1580,10 +1580,10 @@ MonoBehaviour:
   m_PositionInput:
     m_UseReference: 0
     m_Action:
-      m_Name: Position Input
+      m_Name: 
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: 04688dd4-f5a3-4aee-89c6-61360629d584
+      m_Id: 
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -1592,10 +1592,10 @@ MonoBehaviour:
   m_RotationInput:
     m_UseReference: 0
     m_Action:
-      m_Name: Rotation Input
+      m_Name: 
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: ef02572e-5a26-43fd-8711-a0b71d87bedd
+      m_Id: 
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -1744,7 +1744,7 @@ MonoBehaviour:
   m_Camera: {fileID: 1519963314268175880}
   m_OriginBaseGameObject: {fileID: 6425642829315309860}
   m_CameraFloorOffsetObject: {fileID: 3447345814483609931}
-  m_RequestedTrackingOriginMode: 0
+  m_RequestedTrackingOriginMode: 1
   m_CameraYOffset: 1.5
 --- !u!114 &339335618387931960
 MonoBehaviour:
