@@ -11,8 +11,8 @@ public class KeyboardManager : MonoBehaviour
 
     public void ShowKeyboard(TMP_InputField inputField)
     {
-        NonNativeKeyboard.Instance.PresentKeyboard(inputField.text);
         NonNativeKeyboard.Instance.InputField = inputField;
+        NonNativeKeyboard.Instance.PresentKeyboard(inputField.text);
 
         Vector3 direction = positionSource.forward;
         direction.y = 0;

@@ -10,16 +10,6 @@ namespace SlimUI.ModernMenu{
 	public class MenuManager : MonoBehaviour
 	{
 		public static MenuManager Instance { get; private set; }
-		
-		#region Animator Components
-		
-		private Animator CameraObject;
-        private static readonly int EnterRightProperty = Animator.StringToHash("Enter Right");
-        private static readonly int ExitRightProperty = Animator.StringToHash("Exit Right");
-        private static readonly int EnterLeftProperty = Animator.StringToHash("Enter Left");
-        private static readonly int ExitLeftProperty = Animator.StringToHash("Exit Left");
-
-        #endregion
         
         #region Menus
         
@@ -29,8 +19,8 @@ namespace SlimUI.ModernMenu{
         public GameObject mainMenu;
         [Tooltip("THe first list of buttons")]
         public GameObject firstMenu;
-        [Tooltip("The Menu for when the PLAY button is clicked")]
-        public GameObject playMenu;
+        [Tooltip("The Menu for when the LOGIN button is clicked")]
+        public GameObject loginMenu;
         [Tooltip("The Menu for when the EXIT button is clicked")]
         public GameObject exitMenu;
         [Tooltip("Optional 4th Menu")]
@@ -51,12 +41,16 @@ namespace SlimUI.ModernMenu{
         #region Panels
         
         [Header("Panels")]
+        [Tooltip("All UI Panels")]
+        public GameObject[] canvases;
         [Tooltip("The UI Panel parenting all sub menus")]
         public GameObject mainCanvas;
         [Tooltip("The UI Panel for settings")]
         public GameObject settingsCanvas;
         [Tooltip("The UI Panel for login")]
         public GameObject loginCanvas;
+        [Tooltip("The UI Panel for profile")]
+        public GameObject profileCanvas;
         [Tooltip("The UI Panel for loading")]
         public GameObject loadingCanvas;
         [Tooltip("The UI Panel that holds the CONTROLS window tab")]
@@ -118,10 +112,7 @@ namespace SlimUI.ModernMenu{
         #region Profile Screen Components
         
         [Header("Profile Screen")]
-        [SerializeField] private GameObject profilePanel;
-        [SerializeField] private GameObject classroomPanel;
-        [SerializeField] private GameObject examPanel;
-        [SerializeField] private GameObject aiLessonPanel;
+        [SerializeField] private GameObject[] profilePanels;
         [SerializeField] private TMP_Text helloText;
         [SerializeField] private TMP_Text nameText;
         [SerializeField] private TMP_Text classroomText;
@@ -165,10 +156,10 @@ namespace SlimUI.ModernMenu{
         }
 
         void Start(){
-			if (Camera.main != null) CameraObject = Camera.main.GetComponent<Animator>();
+			//if (Camera.main != null) CameraObject = Camera.main.GetComponent<Animator>();
 			if (PlayerPrefs.HasKey("Role")) _role = PlayerPrefs.GetInt("Role");
 
-			playMenu.SetActive(false);
+			loginMenu.SetActive(false);
 			exitMenu.SetActive(false);
 			if(extrasMenu) extrasMenu.SetActive(false);
 			firstMenu.SetActive(true);
@@ -275,18 +266,18 @@ namespace SlimUI.ModernMenu{
 		
 		#region Main
 		
-		public void PlayCampaign(){
+		public void LoginCampaign(){
 			exitMenu.SetActive(false);
 			if(extrasMenu) extrasMenu.SetActive(false);
-			playMenu.SetActive(true);
+			loginMenu.SetActive(true);
 		}
 		
-		public void PlayCampaignMobile(){
+		/*public void PlayCampaignMobile(){
 			exitMenu.SetActive(false);
 			if(extrasMenu) extrasMenu.SetActive(false);
-			playMenu.SetActive(true);
+			loginMenu.SetActive(true);
 			mainMenu.SetActive(false);
-		}
+		}*/
 
 		public void LoginCampaign(int loginType)
 		{
@@ -296,14 +287,44 @@ namespace SlimUI.ModernMenu{
 			PlayerPrefs.SetInt("Role", _role);
 		}
 
-		public void SettingsCampaign()
-		{
-			settingsCanvas.SetActive(true);
-			loginCanvas.SetActive(false);
+		public void DisableLoginCampaign(){
+			loginMenu.SetActive(false);
 		}
 
-		public void ReturnMenu(){
-			playMenu.SetActive(false);
+		public void DisableCanvases()
+		{
+			foreach (GameObject canvas in canvases)
+			{
+				canvas.SetActive(false);
+			}
+		}
+
+		public void EnableMainCanvas()
+		{
+			DisableCanvases();
+			mainCanvas.SetActive(true);
+		}
+
+		public void EnableSettingsCanvas()
+		{
+			DisableCanvases();
+			settingsCanvas.SetActive(true);
+		}
+
+		public void EnableLoginCanvas()
+		{
+			DisableCanvases();
+			loginCanvas.SetActive(true);
+		}
+
+        public void EnableProfileCanvas()
+        {
+			DisableCanvases();
+			profileCanvas.SetActive(true);
+        }
+
+        public void ReturnMenu(){
+			loginMenu.SetActive(false);
 			if(extrasMenu) extrasMenu.SetActive(false);
 			exitMenu.SetActive(false);
 			mainMenu.SetActive(true);
@@ -313,28 +334,6 @@ namespace SlimUI.ModernMenu{
 			if(scene != ""){
 				StartCoroutine(LoadAsynchronously(scene));
 			}
-		}
-
-		public void DisablePlayCampaign(){
-			playMenu.SetActive(false);
-		}
-
-		public void EnterRight(){
-			DisablePlayCampaign();
-			CameraObject.SetTrigger(EnterRightProperty);
-		}
-		
-		public void ExitRight(){
-			CameraObject.SetTrigger(ExitRightProperty);
-		}
-		
-		public void EnterLeft(){
-			DisablePlayCampaign();
-			CameraObject.SetTrigger(EnterLeftProperty);
-		}
-		
-		public void ExitLeft(){
-			CameraObject.SetTrigger(ExitLeftProperty);
 		}
 		
 		public void PlayHover(){
@@ -353,18 +352,18 @@ namespace SlimUI.ModernMenu{
 		public void AreYouSure(){
 			exitMenu.SetActive(true);
 			if(extrasMenu) extrasMenu.SetActive(false);
-			DisablePlayCampaign();
+			DisableLoginCampaign();
 		}
 
-		public void AreYouSureMobile(){
+		/*public void AreYouSureMobile(){
 			exitMenu.SetActive(true);
 			if(extrasMenu) extrasMenu.SetActive(false);
 			mainMenu.SetActive(false);
-			DisablePlayCampaign();
-		}
+			DisableLoginCampaign();
+		}*/
 
 		public void ExtrasMenu(){
-			playMenu.SetActive(false);
+			loginMenu.SetActive(false);
 			if(extrasMenu) extrasMenu.SetActive(true);
 			exitMenu.SetActive(false);
 		}
@@ -623,35 +622,17 @@ namespace SlimUI.ModernMenu{
 		
 		public void DisableLeftPanels()
 		{
-			profilePanel.SetActive(false);
-			classroomPanel.SetActive(false);
-			examPanel.SetActive(false);
-			aiLessonPanel.SetActive(false);
-		}
-		
-		public void ProfilePanel()
-		{
-			DisableLeftPanels();
-			profilePanel.SetActive(true);
-		}
-		
-		public void ClassroomPanel()
-		{
-			DisableLeftPanels();
-			classroomPanel.SetActive(true);
+			foreach(GameObject panel in profilePanels)
+			{
+				panel.SetActive(false);
+			}
 		}
 
-		public void ExamPanel()
+		public void EnableLeftPanel(GameObject panel)
 		{
 			DisableLeftPanels();
-			examPanel.SetActive(true);
+			panel.SetActive(true);
 		}
-        
-        public void AILessonPanel()
-        {
-        	DisableLeftPanels();
-        	aiLessonPanel.SetActive(true);
-        }
 		
 		#endregion Profile
 		

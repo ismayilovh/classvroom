@@ -1,10 +1,7 @@
-using System;
 using PlayFab;
 using PlayFab.ClientModels;
 using SlimUI.ModernMenu;
-using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Managers
 {
@@ -68,7 +65,7 @@ namespace Managers
             // Destroy(ClassroomManager.Instance.gameObject);
             // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             MenuManager.Instance.EnableLoginMode();
-            MenuManager.Instance.ExitLeft();
+            MenuManager.Instance.EnableMainCanvas();
         }
 
         private void OnLoginSuccess(LoginResult result)
@@ -129,8 +126,9 @@ namespace Managers
             {
                 MenuManager.Instance.DisableStudentFields();
             }
-            
-            MenuManager.Instance.EnterLeft();
+
+            MenuManager.Instance.DisableLoginCampaign();
+            MenuManager.Instance.EnableMainCanvas();
         }
 
         private void OnLoginFailure(PlayFabError error)
