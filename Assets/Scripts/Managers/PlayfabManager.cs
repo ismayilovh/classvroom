@@ -66,6 +66,7 @@ namespace Managers
             // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             MenuManager.Instance.EnableLoginMode();
             MenuManager.Instance.EnableMainCanvas();
+            PopupManager.Instance.ShowPopup("You have succesfully logged out");
         }
 
         private void OnLoginSuccess(LoginResult result)
@@ -127,6 +128,7 @@ namespace Managers
                 MenuManager.Instance.DisableStudentFields();
             }
 
+            PopupManager.Instance.ShowPopup($"You have succesfully logged in as {accountName}");
             MenuManager.Instance.DisableLoginCampaign();
             MenuManager.Instance.EnableMainCanvas();
         }
